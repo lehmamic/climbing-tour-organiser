@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write --list-different ."
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
@@ -26,7 +28,10 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.2",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.11",
     "sass": "^1.71.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
