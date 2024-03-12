@@ -2,8 +2,7 @@ import { initializeApp, getApps, FirebaseApp, FirebaseOptions, getApp } from "fi
 import { Auth, getAuth, inMemoryPersistence, setPersistence } from "firebase/auth";
 import { getEnv } from "./get-env";
 
-let app: FirebaseApp;
-let auth: Auth;
+let firebase_app: FirebaseApp;
 
 const env = getEnv();
 
@@ -18,14 +17,13 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
+  firebase_app = initializeApp(firebaseConfig);
+  const auth = getAuth(firebase_app);
 
   // Let Remix handle the persistence via session cookies.
   setPersistence(auth, inMemoryPersistence);
 } else {
-  app = getApp();
-  auth = getAuth(app);
+  firebase_app = getApp();
 }
 
-export { auth };
+export { firebase_app };

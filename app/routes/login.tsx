@@ -1,34 +1,21 @@
 import * as React from 'react';
-import { ActionFunction, redirect } from '@remix-run/node';
+import { ActionFunction } from '@remix-run/node';
 import { Form, Link, useFetcher } from '@remix-run/react';
-import { auth as serverAuth } from "~/utils/firebase.server";
-import { auth as clientAuth } from "~/utils/firebase.client";
-import { session } from '~/utils/cookies';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { firebase_app } from "~/utils/firebase.client";
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserSession } from '~/utils/session.server';
 
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const idToken = form.get("idToken")?.toString() ?? '';
 
-  // Verify the idToken is actually valid
-  await serverAuth.verifyIdToken(idToken);
-
-  const jwt = await serverAuth.createSessionCookie(idToken, {
-    // 5 days - can be up to 2 weeks
-    expiresIn: 60 * 60 * 24 * 5 * 1000,
-  });
-
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await session.serialize(jwt),
-    },
-  });
+  return await createUserSession(idToken, '/');
 };
 
 const LoginPage: React.FunctionComponent = () => {
   const fetcher = useFetcher();
 
-  async function handleSubmit(e: React.SyntheticEvent) {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const target = e.target as typeof e.target & {
       email: { value: string };
@@ -39,7 +26,8 @@ const LoginPage: React.FunctionComponent = () => {
     const password = target.password.value;
 
     try {
-      const credential = await signInWithEmailAndPassword(clientAuth, email, password);
+      const auth = getAuth(firebase_app);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await credential.user.getIdToken();
 
       // Trigger a POST request which the action will handle

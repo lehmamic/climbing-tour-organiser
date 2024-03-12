@@ -1,33 +1,47 @@
 import * as React from 'react';
 import { ActionFunction } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useFetcher } from "@remix-run/react";
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserSession } from '~/utils/session.server';
+import { firebase_app } from "~/utils/firebase.client";
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
+  const form = await request.formData();
+  const idToken = form.get("idToken")?.toString() ?? '';
 
-//   invariant(
-//     formData?.email && typeof formValues?.email === 'string',
-//     "email is empty or isn't a string type",
-// )
-//   invariant(
-//     formData?.password && typeof formValues?.password === 'string',
-//     "password is empty or isn't a string type",
-// )
-
-  const email = formData.get("email");
-  const password = formData.get("password");
-
-  const { user } = await signUp(email, password );
-  const token = await user.getIdToken();
-  return createUserSession(token, "/");
+  return await createUserSession(idToken, '/');
 };
 
 const SignUpPage: React.FunctionComponent = () => {
+  const fetcher = useFetcher();
+
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const target = e.target as typeof e.target & {
+      email: { value: string };
+      password: { value: string };
+    };
+
+    const email = target.email.value;
+    const password = target.password.value;
+
+    try {
+      const auth = getAuth(firebase_app);
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const idToken = await credential.user.getIdToken();
+
+      // Trigger a POST request which the action will handle
+      fetcher.submit({ idToken }, { method: "post", action: "/login" });
+    } catch (e: Error) {
+      // Handle errors...
+    }
+  }
+
   return (
     <div className="signup">
       <h1>Sign Up Page</h1>
 
-      <Form method="post">
+      <Form onSubmit={handleSubmit}>
         <p>
           <label>
             Email

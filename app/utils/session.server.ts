@@ -1,6 +1,6 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { getEnv } from "./get-env";
-import { app } from './firebase.server';
+import { firebase_admin_app } from './firebase.server';
 import { getAuth } from "firebase-admin/auth";
 
 const env = getEnv();
@@ -25,7 +25,7 @@ const storage = createCookieSessionStorage({
 });
 
 async function getSessionToken(idToken: string) {
-  const auth = getAuth(app);
+  const auth = getAuth(firebase_admin_app);
   const decodedToken = await auth.verifyIdToken(idToken);
   if (new Date().getTime() / 1000 - decodedToken.auth_time > 5 * 60) {
     throw new Error("Recent sign in required");
@@ -52,7 +52,7 @@ async function getUserSession(request: Request) {
   if (!token) return null;
 
   try {
-    const auth = getAuth(app);
+    const auth = getAuth(firebase_admin_app);
     const tokenUser = await auth.verifySessionCookie(token, true);
     return tokenUser;
   } catch (error) {

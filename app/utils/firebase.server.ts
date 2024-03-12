@@ -16,12 +16,6 @@ const firebaseAdminConfig: AppOptions = {
     })
 }
 
-if (getApps().length === 0) {
-  app = initializeApp(firebaseAdminConfig);
-  auth = getAuth(app);
-} else {
-  app = getApp();
-  auth = getAuth(app);
-}
+const firebase_admin_app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApp();
 
-export { app, auth };
+export { firebase_admin_app };

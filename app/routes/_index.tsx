@@ -1,10 +1,20 @@
-import { type MetaFunction } from "@remix-run/node";
+import { LoaderFunction, redirect, type MetaFunction } from "@remix-run/node";
+import { getUserSession } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
   return [
     { title: "New Remix App" },
     { name: "description", content: "Welcome to Remix!" },
   ];
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const sessionUser = await getUserSession(request);
+  if (!sessionUser) {
+    return redirect("/login");
+  }
+
+  return null;
 };
 
 export default function Index() {
