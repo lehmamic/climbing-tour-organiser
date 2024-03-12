@@ -5,7 +5,6 @@ import { getEnv } from "./get-env";
 let app: App;
 let auth: Auth;
 
-require('dotenv-flow').config();
 const env = getEnv();
 
 const { privateKey } = JSON.parse(env.FIREBASE_ADMIN_PRIVATE_KEY);
