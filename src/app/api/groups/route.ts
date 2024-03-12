@@ -1,7 +1,7 @@
 import { GROUPS_COLLECTION_NAME, Group } from '@/model/group';
 import { Paged } from '@/model/paged';
 import { MONGODB_DATABASE, clientPromise } from '@/lib/mongodb';
-import { getGroups } from '@/services/groups.service';
+import { createGroup, getGroups } from '@/services/groups.service';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -22,16 +22,8 @@ export const POST = withApiAuthRequired(async (req: NextRequest) => {
   const { user } = (await getSession(req, res)) || {};
 
   const dto = await req.json();
-  const group: Group = {
-    _id: undefined!,
-    name: dto.name,
-    description: dto.description,
-    members: [],
-  };
 
-  const client = await clientPromise;
-  const db = client.db('ClimbingTourOrganiser');
-  const result = await db.collection(GROUPS_COLLECTION_NAME).insertOne(group);
+  const result = await createGroup(user as any, dto.name, dto.description);
 
-  return NextResponse.json({ ...group, _id: result.insertedId }, res);
+  return NextResponse.json(result, res);
 });

@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { User } from './user';
 
 export const GROUPS_COLLECTION_NAME = 'groups';
 
@@ -9,12 +10,13 @@ export const GroupMemberRole = {
 
 export interface GroupMember {
   role: GroupMemberRole;
-  userId: string;
+  userId: ObjectId;
+  user?: User;
 }
 
 export interface Group {
   _id: ObjectId;
   name: string;
-  description: string;
+  description?: string;
   members: GroupMember[];
 }
