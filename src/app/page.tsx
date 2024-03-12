@@ -1,7 +1,7 @@
-export default function Home() {
-  return (
-    <main className="container mx-auto flex min-h-screen flex-col">
+import { NextPage } from 'next';
 
-    </main>
-  );
-}
+const HomePage: NextPage = () => {
+  return <main className="container mx-auto flex min-h-screen flex-col"></main>;
+};
+
+export default HomePage;

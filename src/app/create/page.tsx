@@ -1,45 +1,40 @@
-'use client'
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { NavBar } from '@/components/NavBar';
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { NextPage } from 'next';
 
 const formSchema = z.object({
   name: z.string().min(1, 'The group name is required'),
   description: z.string().optional(),
-})
+});
 
-export default function CreateGroup() {
+const CreateGroupPage: NextPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      description: undefined,
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    fetch('/api/groups', {
+      method: 'POST',
+      body: JSON.stringify({ name: values.name, description: values.description }),
+    });
   }
 
   return (
-    <main className="sm:container sm:mx-auto flex min-h-screen flex-col">
+    <main className="flex min-h-screen flex-col sm:container sm:mx-auto">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mx-60">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mx-60 space-y-8">
           <FormField
             control={form.control}
             name="name"
@@ -49,9 +44,7 @@ export default function CreateGroup() {
                 <FormControl>
                   <Input placeholder="Name" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Name your group.
-                </FormDescription>
+                <FormDescription>Name your group.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -65,9 +58,7 @@ export default function CreateGroup() {
                 <FormControl>
                   <Textarea placeholder="Description" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Describe your group.
-                </FormDescription>
+                <FormDescription>Describe your group.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -77,4 +68,6 @@ export default function CreateGroup() {
       </Form>
     </main>
   );
-}
+};
+
+export default CreateGroupPage;

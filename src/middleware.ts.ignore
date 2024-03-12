@@ -1,0 +1,14 @@
+import { withMiddlewareAuthRequired, getSession } from '@auth0/nextjs-auth0/edge';
+import { NextMiddleware, NextRequest, NextResponse } from 'next/server';
+
+export const middleware: NextMiddleware = withMiddlewareAuthRequired(async (req: NextRequest) => {
+  const res = NextResponse.next();
+  const user = await getSession(req, res);
+  console.log('from middleware');
+  if (user) {
+    res.cookies.set('hl', user.language);
+    //createUser(user.name, user.login);
+  }
+
+  return res;
+});
