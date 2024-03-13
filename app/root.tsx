@@ -1,4 +1,4 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
+import * as React from "react";
 import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
@@ -9,11 +9,15 @@ import {
   ScrollRestoration,
   json,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
+import { NextUIProvider } from "@nextui-org/react";
+
+import stylesheet from "~/tailwind.css";
 
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: stylesheet }
 ];
 
 export async function loader() {
@@ -30,8 +34,9 @@ export async function loader() {
   });
 }
 
-export default function App() {
+const App: React.FunctionComponent = () => {
   const data = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
 
   return (
     <html lang="en">
@@ -42,18 +47,22 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
-        <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              data.ENV
-            )}`,
-          }}
-        />
-        <Scripts />
-        <LiveReload />
+        <NextUIProvider navigate={navigate}>
+          <Outlet />
+          <ScrollRestoration />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(
+                data.ENV
+              )}`,
+            }}
+          />
+          <Scripts />
+          <LiveReload />
+        </NextUIProvider>
       </body>
     </html>
   );
 }
+
+export default App;

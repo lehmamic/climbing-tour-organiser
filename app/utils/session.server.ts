@@ -1,7 +1,8 @@
+import { session } from '~/utils/cookies';
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { getEnv } from "./get-env";
 import { firebase_admin_app } from './firebase.server';
-import { getAuth } from "firebase-admin/auth";
+import { DecodedIdToken, getAuth } from "firebase-admin/auth";
 
 const env = getEnv();
 const sessionSecret = env.SESSION_SECRET;
@@ -47,9 +48,12 @@ async function createUserSession(idToken: string, redirectTo: string) {
 }
 
 async function getUserSession(request: Request) {
-  const cookieSession = await storage.getSession(request.headers.get("Cookie"));
+  const cookie = request.headers.get("Cookie");
+  const cookieSession = await storage.getSession(cookie);
   const token = cookieSession.get("token");
-  if (!token) return null;
+  if (!token) {
+    return null;
+  }
 
   try {
     const auth = getAuth(firebase_admin_app);
@@ -60,11 +64,17 @@ async function getUserSession(request: Request) {
   }
 }
 
-async function destroySession(request: Request) {
+async function getCurrentUser(idToken: DecodedIdToken) {
+  const auth = getAuth(firebase_admin_app);
+  return await auth.getUser(idToken.sub);
+
+}
+
+async function destroySession(request: Request, redirectTo: string) {
   const session = await storage.getSession(request.headers.get("Cookie"));
   const newCookie = await storage.destroySession(session);
 
-  return redirect("/login", { headers: { "Set-Cookie": newCookie } });
+  return redirect(redirectTo, { headers: { "Set-Cookie": newCookie } });
 }
 
-export { createUserSession, getUserSession , destroySession};
+export { createUserSession, getUserSession, getCurrentUser, destroySession};
