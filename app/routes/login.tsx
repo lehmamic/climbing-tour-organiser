@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ActionFunction } from '@remix-run/node';
 import { Form, Link, useFetcher } from '@remix-run/react';
-import { firebase_app } from "~/utils/firebase";
+import { firebase_app } from "~/utils/firebase.client";
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { createUserSession } from '~/utils/session.server';
 import { Button, Input } from '@nextui-org/react';

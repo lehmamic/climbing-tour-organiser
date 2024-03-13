@@ -46,7 +46,7 @@ const App: React.FunctionComponent = () => {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body suppressHydrationWarning={true}>
         <NextUIProvider navigate={navigate}>
           <Outlet />
           <ScrollRestoration />

@@ -1,9 +1,6 @@
-import { App, initializeApp, getApps, cert, getApp, AppOptions } from "firebase-admin/app";
-import { Auth, getAuth } from "firebase-admin/auth";
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert, getApp, AppOptions } from "firebase-admin/app";
 import { getEnv } from "./get-env";
-
-let app: App;
-let auth: Auth;
 
 const env = getEnv();
 
@@ -16,6 +13,6 @@ const firebaseAdminConfig: AppOptions = {
     })
 }
 
-const firebase_admin_app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApp();
+export const firebase_admin_app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApp();
 
-export { firebase_admin_app };
+export const getFirestoreDatabase = () => getFirestore(firebase_admin_app);

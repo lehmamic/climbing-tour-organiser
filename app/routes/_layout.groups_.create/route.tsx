@@ -1,8 +1,8 @@
 import { Button, Input, Textarea } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import * as React from "react";
-import { createGroup } from "~/services/groups.server";
+import { createGroup } from "~/services/groups.service";
 import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
