@@ -1,8 +1,9 @@
 
 import { DocumentData } from "firebase-admin/firestore";
+import { doc } from "firebase/firestore";
 import { Group } from "~/models/group";
 import { Paged } from "~/models/paged";
-import { getFirestoreDatabase } from "~/utils/firebase.server";
+import { firestoreConverter, getFirestoreDatabase } from "~/utils/firebase.server";
 
 export const GROUPS_COLLECTION: string = 'groups';
 
@@ -20,20 +21,11 @@ export const createGroup = async (name: string, description?: string): Promise<G
 }
 
 export const getGroups = async(skip: number, take: number): Promise<Paged<Group>> => {
-  const converter = <T>() => ({
-    toFirestore: (data: Partial<T>) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (<any>data).id;
-      return data;
-    },
-    fromFirestore: (snap: FirebaseFirestore.QueryDocumentSnapshot) => ({ ...snap.data(), id: snap.id }) as T
-  })
-
   const db = getFirestoreDatabase();
   const collectionRef = db.collection(GROUPS_COLLECTION);
 
   const result = await collectionRef
-    .withConverter(converter<Group>())
+    .withConverter(firestoreConverter<Group>())
     .orderBy('name')
     .startAt(skip)
     .limit(take)
@@ -44,4 +36,16 @@ export const getGroups = async(skip: number, take: number): Promise<Paged<Group>
       .get();
 
   return { data: result.docs.map(s => <Group>s.data()), totalCount: totalCount.data().count }
+}
+
+export const getGroup = async (id: string): Promise<Group> => {
+  const db = getFirestoreDatabase();
+  const collectionRef = db.collection(GROUPS_COLLECTION);
+
+  const result = await collectionRef
+    .withConverter(firestoreConverter<Group>())
+    .doc(id)
+    .get();
+
+    return <Group>result.data() ?? null;
 }
