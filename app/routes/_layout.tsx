@@ -39,8 +39,8 @@ const NavbarLayout: React.FunctionComponent = () => {
   const user = useLoaderData<typeof loader>();
 
   return (
-    <div>
-      <Navbar>
+    <main>
+      <Navbar className="border-b">
         <NavbarBrand>
           {/* <AcmeLogo /> */}
           <p className="font-bold text-inherit">ACME</p>
@@ -77,8 +77,10 @@ const NavbarLayout: React.FunctionComponent = () => {
           </NavbarContent>
         )}
       </Navbar>
-      <Outlet />
-    </div>
+      <section className="md:container md:mx-auto max-w-[1024px] px-6 pt-6 prose dark:prose-invert">
+        <Outlet />
+      </section>
+    </main>
   );
 };
 

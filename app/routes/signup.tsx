@@ -3,7 +3,7 @@ import { ActionFunction } from "@remix-run/node";
 import { Form, Link, useFetcher } from "@remix-run/react";
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { createUserSession } from '~/utils/session.server';
-import { firebase_app } from "~/utils/firebase.client";
+import { firebase_app } from "~/utils/firebase";
 import { Button, Input } from '@nextui-org/react';
 
 export const action: ActionFunction = async ({ request }) => {
