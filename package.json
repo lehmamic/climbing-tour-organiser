@@ -21,12 +21,15 @@
     "firebase-admin": "^12.0.0",
     "framer-motion": "^11.0.12",
     "isbot": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mailtrap": "^3.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.1",
     "@tailwindcss/typography": "github:tailwindcss/typography",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",

@@ -1,19 +1,20 @@
 import { Card, CardHeader } from "@nextui-org/react";
-import { LoaderFunction, json } from "@remix-run/node";
+import {LoaderFunction, json, redirect} from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import * as React from "react";
 import { Group } from "~/models/group";
 import { Paged } from "~/models/paged";
-import { getGroups } from "~/services/groups.service";
+import { getGroups } from "~/services/groups.server";
 import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const sessionUser = await getUserSession(request);
   if (!sessionUser) {
-    return null;
+    return redirect(`/login?redirectTo=${encodeURIComponent(request.url)}`)
   }
 
-  const groups = await getGroups(0, 10);
+  console.dir(sessionUser);
+  const groups = await getGroups(sessionUser.uid, 0, 10);
   return json(groups);
 };
 

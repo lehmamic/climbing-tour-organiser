@@ -1,20 +1,37 @@
 import * as React from 'react';
 import { ActionFunction } from "@remix-run/node";
-import { Form, Link, useFetcher } from "@remix-run/react";
+import {Form, Link, useFetcher, useSearchParams} from "@remix-run/react";
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { createUserSession } from '~/utils/session.server';
+import { createUserSession, getCurrentUser, getDecodedIdToken } from '~/utils/session.server';
 import { firebase_app } from "~/utils/firebase.client";
 import { Button, Input } from '@nextui-org/react';
+import { createUser } from '~/services/users.server';
+import {useCallback} from "react";
 
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const idToken = form.get("idToken")?.toString() ?? '';
+  const redirectTo = new URL(request.url).searchParams.get('redirectTo');
 
-  return await createUserSession(idToken, '/');
+  const response = await createUserSession(idToken, redirectTo ?? '/');
+
+  const jwt = await getDecodedIdToken(idToken);
+  const firebaseAuthUser = await getCurrentUser(jwt);
+  await createUser(firebaseAuthUser.uid, firebaseAuthUser.displayName, firebaseAuthUser.email);
+
+  return response;
 };
 
 const SignUpPage: React.FunctionComponent = () => {
   const fetcher = useFetcher();
+  const [searchParams] = useSearchParams();
+
+  const getRedirectToQueryParams = useCallback(
+    () => {
+      const redirectTo = searchParams.get('redirectTo');
+      return redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : '';
+    },
+    [searchParams]);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -32,8 +49,8 @@ const SignUpPage: React.FunctionComponent = () => {
       const idToken = await credential.user.getIdToken();
 
       // Trigger a POST request which the action will handle
-      fetcher.submit({ idToken }, { method: "post", action: "/login" });
-    } catch (e: Error) {
+      fetcher.submit({ idToken }, { method: "post", action: `/signup${getRedirectToQueryParams()}` });
+    } catch (e: unknown) {
       // Handle errors...
     }
   }
@@ -55,7 +72,7 @@ const SignUpPage: React.FunctionComponent = () => {
                 <Input type="password" name="password" label="Password" id="password" variant="bordered" placeholder="••••••••" className="block w-full" isRequired />
                 <Button type="submit" color="primary" className='w-full py-2.5 font-medium'>Register</Button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                    Already have an account? <Link to="/login" className="font-medium text-primary hover:underline dark:text-primary">Sign in</Link>
+                  Already have an account? <Link to={`/login${getRedirectToQueryParams()}`} className="font-medium text-primary hover:underline dark:text-primary">Sign in</Link>
                 </p>
               </Form>
             </div>

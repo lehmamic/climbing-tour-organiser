@@ -2,28 +2,23 @@ import { Button, Input, Textarea } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import * as React from "react";
-import { createGroup } from "~/services/groups.service";
+import { createGroup } from "~/services/groups.server";
 import { getUserSession } from "~/utils/session.server";
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const sessionUser = await getUserSession(request);
-  if (!sessionUser) {
-    return redirect('/login');
-  }
-
-  return null;
-};
 
 export const action: ActionFunction = async ({ request }) => {
+  const sessionUser = await getUserSession(request);
+  if (!sessionUser) {
+    return redirect(`/login?redirectTo=${encodeURIComponent(request.url)}`)
+  }
+
   const form = await request.formData();
   const name = form.get("name")?.toString() ?? '';
-  const description = form.get("name")?.toString();
+  const description = form.get("description")?.toString();
 
-  console.log('POST create groups')
+  const group = await createGroup(sessionUser?.sub, name, description);
 
-  await createGroup(name, description);
-
-  return redirect('/groups')
+  return redirect(`/groups/${group.id}`);
 };
 
 const CreateGroupPage: React.FunctionComponent = () => {

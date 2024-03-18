@@ -25,6 +25,11 @@ const storage = createCookieSessionStorage({
   },
 });
 
+export const getDecodedIdToken = async (idToken: string): Promise<DecodedIdToken> => {
+  const auth = getAuth(firebase_admin_app);
+  return await auth.verifyIdToken(idToken);
+}
+
 async function getSessionToken(idToken: string) {
   const auth = getAuth(firebase_admin_app);
   const decodedToken = await auth.verifyIdToken(idToken);

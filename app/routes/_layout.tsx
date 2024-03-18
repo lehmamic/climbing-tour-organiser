@@ -62,7 +62,7 @@ const NavbarLayout: React.FunctionComponent = () => {
             <NavbarItem>
             <Dropdown>
               <DropdownTrigger>
-                <Avatar src={user.imageUrl} name={user.displayName}></Avatar>
+                <Avatar src={user.imageUrl} name={user.displayName} isBordered></Avatar>
               </DropdownTrigger>
               <DropdownMenu aria-label="Static Actions">
                 <DropdownItem key="groups" showDivider>

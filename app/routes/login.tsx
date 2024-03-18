@@ -1,20 +1,35 @@
 import * as React from 'react';
 import { ActionFunction } from '@remix-run/node';
-import { Form, Link, useFetcher } from '@remix-run/react';
+import {Form, Link, useFetcher, useSearchParams} from '@remix-run/react';
 import { firebase_app } from "~/utils/firebase.client";
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { createUserSession } from '~/utils/session.server';
 import { Button, Input } from '@nextui-org/react';
+import {useCallback} from "react";
 
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const idToken = form.get("idToken")?.toString() ?? '';
 
-  return await createUserSession(idToken, '/');
+  let redirectTo = new URL(request.url).searchParams.get('redirectTo');
+  if (redirectTo) {
+    const url = new URL(redirectTo);
+    redirectTo = url.pathname + url.search;
+  }
+
+  return await createUserSession(idToken, redirectTo ?? '/');
 };
 
 const LoginPage: React.FunctionComponent = () => {
   const fetcher = useFetcher();
+  const [searchParams] = useSearchParams();
+
+  const getRedirectToQueryParams = useCallback(
+    () => {
+      const redirectTo = searchParams.get('redirectTo');
+      return redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : '';
+    },
+    [searchParams]);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -32,7 +47,7 @@ const LoginPage: React.FunctionComponent = () => {
       const idToken = await credential.user.getIdToken();
 
       // Trigger a POST request which the action will handle
-      fetcher.submit({ idToken }, { method: "post", action: "/login" });
+      fetcher.submit({ idToken }, { method: "post", action: `/login${getRedirectToQueryParams()}` });
     } catch (e: unknown) {
       // Handle errors...
     }
@@ -66,7 +81,7 @@ const LoginPage: React.FunctionComponent = () => {
                 </div> */}
                 <Button type="submit" color="primary" className='w-full py-2.5 font-medium'>Sign in</Button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                    Don’t have an account yet? <Link to="/signup" className="font-medium text-primary hover:underline dark:text-primary">Register</Link>
+                  Don’t have an account yet? <Link to={`/signup${getRedirectToQueryParams()}`} className="font-medium text-primary hover:underline dark:text-primary">Register</Link>
                 </p>
               </Form>
             </div>
