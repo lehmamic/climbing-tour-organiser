@@ -1,6 +1,6 @@
 import {LoaderFunction, redirect} from '@remix-run/node';
-import {destroySession, getUserSession} from '~/utils/session.server';
-import {veryInvitationToken} from "~/services/token.server";
+import {getUserSession} from '~/utils/session.server';
+import {verifyInvitationToken} from "~/services/token.server";
 import {getGroup, updateGroup} from "~/services/groups.server";
 import {GroupMemberRole} from "~/models/group";
 import {userRef} from "~/services/users.server";
@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return null;
   }
 
-  const decoded = veryInvitationToken(token);
+  const decoded = verifyInvitationToken(token);
   if (!decoded.success ||!decoded.data) {
     return null;
   }

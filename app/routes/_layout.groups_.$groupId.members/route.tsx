@@ -1,4 +1,4 @@
-import {Avatar, Button, Input} from "@nextui-org/react";
+import {Avatar, Button, Card, CardBody, Input} from "@nextui-org/react";
 import {LoaderFunction, json, ActionFunction} from "@remix-run/node";
 import {Form, useLoaderData} from "@remix-run/react";
 import * as React from "react";
@@ -7,15 +7,15 @@ import {getGroup, getGroupMembers} from "~/services/groups.server";
 import {inviteGroupMember} from "~/services/email.server";
 
 export const loader: LoaderFunction = async ({ params }) => {
-  const group = await getGroupMembers(params.groupId ?? '');
-  if (!group) {
+  const members = await getGroupMembers(params.groupId ?? '');
+  if (!members) {
     throw new Response(null, {
       status: 404,
       statusText: "Not Found",
     });
   }
 
-  return json(group);
+  return json(members);
 };
 
 export const action: ActionFunction = async ({ params, request }) => {
@@ -38,9 +38,15 @@ const MembersPage: React.FunctionComponent = () => {
   const members: GroupMember[] = useLoaderData<typeof loader>();
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {members.map(m => (
-        <div key={m.userRef} className="flex gap-2"><Avatar></Avatar>{m.user?.email}</div>
+        <Card key={m.userRef}>
+          <CardBody>
+            <div className="flex gap-2">
+              <Avatar size={'lg'} /><span>{m.user?.email}</span>
+            </div>
+          </CardBody>
+        </Card>
       ))}
       <div>
         <Form method="POST">

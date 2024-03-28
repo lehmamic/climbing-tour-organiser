@@ -23,8 +23,6 @@ export const createUser = async (sub: string, name?: string, email?: string): Pr
 }
 
 export const getUserByRef = async (ref: string): Promise<User> => {
-
-
   const db = getFirestoreDatabase();
   const userDoc = await db
     .doc(ref)

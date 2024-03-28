@@ -12,7 +12,7 @@ export const generateInvitationToken = (email: string, groupId: string): string 
   return jwt.sign(payload, secret, options);
 }
 
-export const veryInvitationToken = (token: string): { success: boolean; data?: { email: string, groupId: string }; error?: string; } => {
+export const verifyInvitationToken = (token: string): { success: boolean; data?: { email: string, groupId: string }; error?: string; } => {
   const secret = 'your-secret-key';
   try {
     const decoded = jwt.verify(token, secret) as any;

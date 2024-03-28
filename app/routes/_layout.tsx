@@ -15,8 +15,11 @@ import {
   DropdownSection,
   DropdownItem
 } from "@nextui-org/dropdown";
+import {
+  Link
+} from "@nextui-org/link";
 import { Button } from "@nextui-org/button";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import { LoaderFunction, json } from "@remix-run/node";
 import { getCurrentUser, getUserSession } from "~/utils/session.server";
 import { Avatar } from "@nextui-org/react";
@@ -40,7 +43,7 @@ const NavbarLayout: React.FunctionComponent = () => {
 
   return (
     <main>
-      <Navbar className="border-b">
+      <Navbar isBordered>
         <NavbarBrand>
           {/* <AcmeLogo /> */}
           <p className="font-bold text-inherit">ACME</p>
@@ -48,10 +51,10 @@ const NavbarLayout: React.FunctionComponent = () => {
         {!user && (
           <NavbarContent justify="end">
             <NavbarItem className="lg:flex">
-              <Link to="/login">Login</Link>
+              <Link href="/login">Login</Link>
             </NavbarItem>
             <NavbarItem>
-              <Button as={Link} color="primary" href="/signup" variant="flat">
+              <Button as={Link} type="button" color="primary" href="/signup" variant="flat">
                 Sign Up
               </Button>
             </NavbarItem>
@@ -65,11 +68,11 @@ const NavbarLayout: React.FunctionComponent = () => {
                 <Avatar src={user.imageUrl} name={user.displayName} isBordered></Avatar>
               </DropdownTrigger>
               <DropdownMenu aria-label="Static Actions">
-                <DropdownItem key="groups" showDivider>
-                  <Link to={'/groups'}>Groups</Link>
+                <DropdownItem key="groups" href="/groups" showDivider>
+                  Groups
                 </DropdownItem>
-                <DropdownItem key="logout">
-                  <Link to={'/logout'}>Log out</Link>
+                <DropdownItem key="logout" href="/logout">
+                  Log out
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>

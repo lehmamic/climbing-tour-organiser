@@ -12,12 +12,12 @@ export const inviteGroupMember = async (email: string, group: Group) => {
   const client = new MailtrapClient({ token: env.MAILTRAP_TOKEN });
   await client
     .send({
-      from: { name: "Mailtrap Test", email: env.MAILTRAP_SENDER_EMAIL },
+      from: { name: env.MAILTRAP_SENDER_NAME, email: env.MAILTRAP_SENDER_EMAIL },
       to: [{ email }],
-      template_uuid: "ea875258-b394-4409-a4b8-6caf5146b140",
+      template_uuid: env.MAILTRAP_GROUP_INVITATION_TEMPLATE_ID,
       template_variables: {
         "group_name": group.name,
-        "join_link": joinLink
+        "join_link": joinLink,
       }
     });
 }
